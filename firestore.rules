@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: events
+    // Document ID: auto-generated or event-slug
+    // Fields:
+    //   - title: string (required) - שם האירוע
+    //   - category: string (required) - ענף ספורט
+    //   - date: string (required) - תאריך האירוע
+    //   - day: number (required) - יום בחודש
+    //   - month: string (required) - חודש מקוצר
+    //   - location: string (required) - מיקום האירוע
+    //   - logo: string (optional) - URL ללוגו
+    //   - heroImage: string (optional) - URL לתמונת רקע
+    //   - active: bool (optional) - האם האירוע פעיל
+    //   - dimmed: bool (optional) - האם האירוע עבר
+    //   - athletes: list (optional) - רשימת ספורטאים
+    //   - history: list (optional) - היסטוריית הצלחות
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "roeiyehezkel@kehilatsport.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['title', 'category', 'date', 'day', 'month', 'location']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.category is string && data.category.size() > 0 && data.category.size() < 100 &&
+             data.date is string && data.date.size() > 0 && data.date.size() < 100 &&
+             data.day is number && data.day >= 1 && data.day <= 31 &&
+             data.month is string && data.month.size() > 0 && data.month.size() < 20 &&
+             data.location is string && data.location.size() > 0 && data.location.size() < 200 &&
+             (!('logo' in data) || (data.logo is string && data.logo.size() < 1000)) &&
+             (!('heroImage' in data) || (data.heroImage is string && data.heroImage.size() < 1000)) &&
+             (!('active' in data) || data.active is bool) &&
+             (!('dimmed' in data) || data.dimmed is bool) &&
+             (!('athletes' in data) || data.athletes is list) &&
+             (!('history' in data) || data.history is list);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidEvent(request.resource.data);
+      allow update: if isAdmin() && isValidEvent(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /athletes/{athleteId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /articles/{articleId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'user';
+      allow update: if isAuthenticated() && (request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
+    }
+  }
+}

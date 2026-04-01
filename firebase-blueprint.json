@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "Event": {
+      "title": "אירוע ספורט",
+      "description": "אירוע בלוח השנה האולימפי",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "שם האירוע" },
+        "category": { "type": "string", "description": "ענף ספורט" },
+        "date": { "type": "string", "description": "תאריך האירוע (למשל: 2-4 פברואר, 2024)" },
+        "day": { "type": "integer", "description": "יום בחודש (למשל: 12)" },
+        "month": { "type": "string", "description": "חודש מקוצר (למשל: ינו)" },
+        "location": { "type": "string", "description": "מיקום האירוע" },
+        "logo": { "type": "string", "description": "URL ללוגו האירוע" },
+        "heroImage": { "type": "string", "description": "URL לתמונת רקע" },
+        "active": { "type": "boolean", "description": "האם האירוע פעיל כרגע" },
+        "dimmed": { "type": "boolean", "description": "האם האירוע עבר" },
+        "athletes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "category": { "type": "string" },
+              "rank": { "type": "string" },
+              "image": { "type": "string" }
+            }
+          }
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "year": { "type": "string" },
+              "results": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "medal": { "type": "string" },
+                    "weight": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["title", "category", "date", "day", "month", "location"]
+    },
+    "Athlete": {
+      "title": "ספורטאי",
+      "description": "פרופיל ספורטאי אולימפי",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "מזהה ייחודי (למשל: raz-hershko)" },
+        "name": { "type": "string", "description": "שם הספורטאי" },
+        "sport": { "type": "string", "description": "ענף ספורט" },
+        "category": { "type": "string", "description": "קטגוריה/משקל" },
+        "rank": { "type": "string", "description": "דירוג עולמי" },
+        "olympicMedals": { "type": "string", "description": "מדליות אולימפיות" },
+        "bio": { "type": "string", "description": "ביוגרפיה קצרה" },
+        "heroImage": { "type": "string", "description": "URL לתמונת פרופיל" },
+        "birthDate": { "type": "string", "description": "תאריך לידה" },
+        "height": { "type": "string", "description": "גובה" },
+        "coach": { "type": "string", "description": "מאמן" },
+        "upcomingEvent": { "type": "string", "description": "אירוע קרוב" },
+        "achievements": { "type": "array", "items": { "type": "object", "properties": { "year": { "type": "string" }, "title": { "type": "string" }, "desc": { "type": "string" } } } },
+        "news": { "type": "array", "items": { "type": "object", "properties": { "date": { "type": "string" }, "title": { "type": "string" } } } },
+        "schedule": { "type": "array", "items": { "type": "object", "properties": { "date": { "type": "string" }, "event": { "type": "string" }, "location": { "type": "string" } } } }
+      },
+      "required": ["id", "name", "sport", "category", "heroImage"]
+    },
+    "News": {
+      "title": "חדשות רצות",
+      "description": "מבזקי חדשות קצרים",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string", "description": "תוכן המבזק" },
+        "timestamp": { "type": "string", "description": "זמן פרסום" },
+        "category": { "type": "string", "description": "קטגוריה (למשל: ג'ודו, שחייה)" }
+      },
+      "required": ["text", "timestamp"]
+    },
+    "Article": {
+      "title": "כתבה",
+      "description": "כתבת עומק או חדשות מורחבות",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "כותרת הכתבה" },
+        "excerpt": { "type": "string", "description": "תקציר" },
+        "content": { "type": "string", "description": "תוכן הכתבה (Markdown)" },
+        "image": { "type": "string", "description": "URL לתמונה ראשית" },
+        "category": { "type": "string", "description": "ענף ספורט" },
+        "author": { "type": "string", "description": "שם הכותב" },
+        "date": { "type": "string", "description": "תאריך פרסום" }
+      },
+      "required": ["title", "excerpt", "content", "image", "category", "date"]
+    }
+  },
+  "firestore": {
+    "/events": {
+      "schema": "Event",
+      "description": "אוסף אירועי ספורט"
+    },
+    "/athletes": {
+      "schema": "Athlete",
+      "description": "אוסף ספורטאים"
+    },
+    "/news": {
+      "schema": "News",
+      "description": "אוסף מבזקי חדשות"
+    },
+    "/articles": {
+      "schema": "Article",
+      "description": "אוסף כתבות"
+    }
+  }
+}

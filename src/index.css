@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Be Vietnam Pro", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --color-on-surface-variant: #c5c6ce;
+  --color-on-secondary: #2f3131;
+  --color-on-secondary-fixed-variant: #464747;
+  --color-inverse-surface: #d8e2fd;
+  --color-on-tertiary-fixed-variant: #6c3a00;
+  --color-on-tertiary-fixed: #2e1500;
+  --color-surface-container: #152033;
+  --color-tertiary: #ffb779;
+  --color-on-tertiary: #4c2700;
+  --color-primary: #e9c349;
+  --color-surface-bright: #2f394e;
+  --color-inverse-on-surface: #263045;
+  --color-tertiary-fixed-dim: #ffb779;
+  --color-outline: #8f9098;
+  --color-on-primary-container: #a88706;
+  --color-on-error-container: #ffdad6;
+  --color-surface-dim: #081326;
+  --color-tertiary-container: #391c00;
+  --color-on-primary: #3c2f00;
+  --color-on-tertiary-container: #c5782c;
+  --color-on-secondary-container: #b8b8b8;
+  --color-secondary-container: #484949;
+  --color-error-container: #93000a;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-surface-variant: #2a3549;
+  --color-primary-fixed: #ffe088;
+  --color-secondary: #c6c6c6;
+  --color-on-secondary-fixed: #1a1c1c;
+  --color-background: #081326;
+  --color-outline-variant: #44474e;
+  --color-on-background: #d8e2fd;
+  --color-primary-container: #2d2200;
+  --color-on-surface: #d8e2fd;
+  --color-secondary-fixed-dim: #c6c6c6;
+  --color-inverse-primary: #735c00;
+  --color-on-primary-fixed: #241a00;
+  --color-on-primary-fixed-variant: #574500;
+  --color-surface-container-low: #111c2f;
+  --color-surface-container-lowest: #040e21;
+  --color-surface-container-high: #202a3e;
+  --color-surface: #081326;
+  --color-secondary-fixed: #e3e2e2;
+  --color-surface-tint: #e9c349;
+  --color-primary-fixed-dim: #e9c349;
+  --color-surface-container-highest: #2a3549;
+  --color-tertiary-fixed: #ffdcc1;
+
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+}
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+  body {
+    @apply bg-background text-on-background font-body;
+    direction: rtl;
+  }
+}
+
+@utility editorial-gradient {
+  background: linear-gradient(135deg, #e9c349 0%, #a88706 100%);
+}
+
+@utility text-shadow-hero {
+  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+@utility animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
