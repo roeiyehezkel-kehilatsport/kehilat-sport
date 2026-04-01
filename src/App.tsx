@@ -38,6 +38,8 @@ interface Event {
   date: string;
   day: number;
   month: string;
+  monthIndex?: number;
+  year?: number;
   location: string;
   logo?: string;
   heroImage?: string;
@@ -106,7 +108,7 @@ const ATHLETES_DATA: Athlete[] = [
     rank: "24",
     olympicMedals: 1,
     bio: "רז הרשקו נולדה ב-1998 והחלה את דרכה על המזרן כבר בגיל צעיר. כיום היא נחשבת לאחת הג'ודוקא המובילות בעולם בקטגוריית המשקל שלה, המשלבת כוח מתפרץ עם טכניקה חסרת פשרות. הקריירה המקצוענית שלה המריאה עם זכיות במדליות בטורנירי הגראנד סלאם והגראנד פרי היוקרתיים. היא ידועה ברוח הלחימה שלה ובחיוך המפורסם שמסתיר מאחוריו נחישות של אלופה אמיתית.",
-    heroImage: "https://static.wixstatic.com/media/374cca_9e2bd404e4794ea39aa47312178ec8fc~mv2.jpg/v1/fill/w_247,h_309,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/374cca_9e2bd404e4794ea39aa47312178ec8fc~mv2.jpg",
+    heroImage: "https://picsum.photos/seed/raz-hershko-hero/1200/800",
     bgText: "JUDO",
     birthDate: "19 ביוני, 1998",
     height: "1.74 מ'",
@@ -138,8 +140,8 @@ const ATHLETES_DATA: Athlete[] = [
     category: "מכשירים | קרקע",
     rank: "1",
     olympicMedals: 2,
-    bio: "ארטיום דולגופיאט הוא המתעמל הישראלי המעוטר ביותר בכל הזמנים. האלוף האולימפי מטוקיו 2020 וסגן האלוף האולימפי מפריז 2024 בתרגיל הקרקע. דולגופיאט ידוע ברמת קושי גבוהה במיוחד ובביצועים מדויקים שהפכו אותו לשם דבר בעולם ההתעמלות.",
-    heroImage: "https://static.wixstatic.com/media/374cca_7e9de6976759480f84281fdf5db24ff4~mv2.jpg/v1/fill/w_335,h_251,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/374cca_7e9de6976759480f84281fdf5db24ff4~mv2.jpg",
+    bio: "ארטיום דולגופיאט הוא המתעמל הישראלי המעוטר ביותר בכל הזמנים. האלוף האולימפי מטוקיו 2020 ופריז 2024 בתרגיל הקרקע. דולגופיאט ידוע ברמת קושי גבוהה במיוחד ובביצועים מדויקים שהפכו אותו לשם דבר בעולם ההתעמלות.",
+    heroImage: "https://picsum.photos/seed/artem-hero/1200/800",
     bgText: "GOLD",
     birthDate: "16 ביוני, 1997",
     height: "1.62 מ'",
@@ -171,7 +173,7 @@ const ATHLETES_DATA: Athlete[] = [
     rank: "3",
     olympicMedals: 0,
     bio: "אנסטסיה גורבנקו היא השחיינית הישראלית המצליחה ביותר בכל הזמנים. היא מחזיקה בעשרות שיאים לאומיים וזכתה בתארים אירופיים ועולמיים. גורבנקו ידועה ביכולת הרב-גונית שלה ובחוסן המנטלי המאפשר לה להתחרות ברמות הגבוהות ביותר.",
-    heroImage: "https://static.wixstatic.com/media/374cca_92826eae0a82407bba340f96c6522fd0~mv2.jpg/v1/fill/w_335,h_223,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/374cca_92826eae0a82407bba340f96c6522fd0~mv2.jpg",
+    heroImage: "https://picsum.photos/seed/anastasia-hero/1200/800",
     bgText: "SWIM",
     birthDate: "7 באוגוסט, 2003",
     height: "1.76 מ'",
@@ -203,7 +205,7 @@ const ATHLETES_DATA: Athlete[] = [
     rank: "1",
     olympicMedals: 1,
     bio: "שרון קנטור היא אלופת העולם וסגנית האלופה האולימפית בדגם ה-iQFoil. היא פרצה לצמרת העולמית במהירות מסחררת והפכה לאחת הגולשות הדומיננטיות ביותר בסבב העולמי. קנטור ידועה ביכולת הטקטית שלה וביכולת להתמודד עם תנאי ים משתנים.",
-    heroImage: "https://static.wixstatic.com/media/374cca_c9993a93342142d6bb64e0a515504a3d~mv2.jpg/v1/fill/w_274,h_304,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/374cca_c9993a93342142d6bb64e0a515504a3d~mv2.jpg",
+    heroImage: "https://picsum.photos/seed/sharon-hero/1200/800",
     bgText: "WIND",
     birthDate: "28 בינואר, 2003",
     height: "1.70 מ'",
@@ -567,9 +569,51 @@ const HomePage = ({ onPageChange, articles }: { onPageChange: (page: Page) => vo
 }
 
 const CalendarPage = ({ onPageChange, events }: { onPageChange: (page: Page) => void, events: Event[] }) => {
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  const [viewDate, setViewDate] = useState(new Date());
   
+  const currentMonth = viewDate.getMonth();
+  const currentYear = viewDate.getFullYear();
+  
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  
+  const weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  const monthsHebrew = [
+    'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+    'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+  ];
+  const monthsShortHebrew = [
+    'ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ',
+    'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'
+  ];
+
+  const handlePrevMonth = () => {
+    setViewDate(new Date(currentYear, currentMonth - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setViewDate(new Date(currentYear, currentMonth + 1, 1));
+  };
+
+  const isToday = (day: number) => {
+    const today = new Date();
+    return today.getDate() === day && 
+           today.getMonth() === currentMonth && 
+           today.getFullYear() === currentYear;
+  };
+
+  const getEventsForDay = (day: number) => {
+    return events.filter(e => {
+      // If we have explicit monthIndex and year, use them
+      if (e.monthIndex !== undefined && e.year !== undefined) {
+        return e.day === day && e.monthIndex === currentMonth && e.year === currentYear;
+      }
+      // Fallback to month string and assume current year (2024 as per initial data)
+      const monthIdx = monthsShortHebrew.indexOf(e.month);
+      return e.day === day && monthIdx === currentMonth && (e.year || 2024) === currentYear;
+    });
+  };
+
   return (
     <div className="lg:col-span-9">
       <motion.div 
@@ -578,41 +622,81 @@ const CalendarPage = ({ onPageChange, events }: { onPageChange: (page: Page) => 
         className="space-y-8"
       >
         <header className="relative overflow-hidden rounded-3xl bg-surface-container-low p-8 md:p-12 border-r-4 border-primary">
-          <div className="relative z-10">
-            <h1 className="text-5xl md:text-7xl font-black font-headline text-primary mb-4 tracking-tighter">לוח אירועים</h1>
-            <p className="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
-              עקבו אחר המסע של המשלחת הישראלית. כל התחרויות, המוקדמות ורגעי השיא בדרך לפודיום.
-            </p>
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="text-right">
+              <h1 className="text-5xl md:text-7xl font-black font-headline text-primary mb-4 tracking-tighter">לוח אירועים</h1>
+              <p className="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+                עקבו אחר המסע של המשלחת הישראלית. כל התחרויות, המוקדמות ורגעי השיא בדרך לפודיום.
+              </p>
+            </div>
+            <div className="flex items-center gap-6 bg-surface-container-high p-4 rounded-2xl border border-white/5 shadow-xl">
+              <button 
+                onClick={handleNextMonth}
+                className="p-3 hover:bg-primary/20 rounded-xl transition-colors text-primary"
+              >
+                <ChevronLeft className="w-8 h-8 rotate-180" />
+              </button>
+              <div className="text-center min-w-[150px]">
+                <div className="text-3xl font-black font-headline text-on-surface">{monthsHebrew[currentMonth]}</div>
+                <div className="text-sm font-bold text-on-surface-variant tracking-widest">{currentYear}</div>
+              </div>
+              <button 
+                onClick={handlePrevMonth}
+                className="p-3 hover:bg-primary/20 rounded-xl transition-colors text-primary"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+            </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
           {weekDays.map(day => (
-            <div key={day} className="bg-surface-container-lowest p-4 text-center text-sm font-bold text-on-surface-variant uppercase tracking-widest border-b border-white/5">
+            <div key={day} className="bg-surface-container-lowest p-6 text-center text-sm font-black text-on-surface-variant uppercase tracking-widest border-b border-white/5">
               {day}
             </div>
           ))}
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={`empty-${i}`} className="bg-surface-container-lowest/30 min-h-[120px] p-4 opacity-30"></div>
+          
+          {/* Empty cells for the first week */}
+          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+            <div key={`empty-${i}`} className="bg-surface-container-lowest/30 min-h-[150px] p-4 opacity-30"></div>
           ))}
-          {days.map(day => {
-            const dayEvents = events.filter(e => e.day === day);
+          
+          {/* Days of the month */}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dayEvents = getEventsForDay(day);
+            const today = isToday(day);
+            
             return (
-              <div key={day} className={`bg-surface-container-low min-h-[150px] p-4 hover:bg-surface-container-high transition-colors group border border-white/5 ${day === 3 ? 'ring-2 ring-primary/50 z-10' : ''}`}>
+              <div key={day} className={`bg-surface-container-low min-h-[180px] p-4 hover:bg-surface-container-high transition-all group border border-white/5 relative ${today ? 'ring-2 ring-primary z-10' : ''}`}>
                 <div className="flex justify-between items-start mb-4">
-                  <span className={`text-2xl font-black font-headline ${day === 3 ? 'text-primary' : 'text-on-surface/50'}`}>{day.toString().padStart(2, '0')}</span>
-                  {day === 3 && <span className="bg-primary text-background text-[10px] font-bold px-2 py-0.5 rounded">היום</span>}
+                  <span className={`text-3xl font-black font-headline ${today ? 'text-primary' : 'text-on-surface/30'}`}>
+                    {day.toString().padStart(2, '0')}
+                  </span>
+                  {today && (
+                    <span className="bg-primary text-background text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                      היום
+                    </span>
+                  )}
                 </div>
-                {dayEvents.map(event => (
-                  <div 
-                    key={event.id}
-                    className={`${event.category === 'ג\'ודו' ? 'bg-primary/10 border-primary' : 'bg-secondary/10 border-secondary'} border-r-2 p-2 rounded-sm mb-1 cursor-pointer hover:bg-opacity-20 transition-all`}
-                    onClick={() => onPageChange(`event:${event.id}`)}
-                  >
-                    <div className={`text-[10px] font-bold ${event.category === 'ג\'ודו' ? 'text-primary' : 'text-secondary'}`}>{event.category} • {event.title}</div>
-                    <div className="text-xs font-bold truncate">{event.location}</div>
-                  </div>
-                ))}
+                
+                <div className="space-y-2">
+                  {dayEvents.map(event => (
+                    <div 
+                      key={event.id}
+                      className={`${event.category === 'ג\'ודו' ? 'bg-primary/10 border-primary text-primary' : 'bg-secondary/10 border-secondary text-secondary'} border-r-4 p-3 rounded-xl cursor-pointer hover:scale-105 transition-all shadow-sm`}
+                      onClick={() => onPageChange(`event:${event.id}`)}
+                    >
+                      <div className="text-[10px] font-black uppercase tracking-tight mb-1 opacity-80">{event.category}</div>
+                      <div className="text-xs font-bold leading-tight line-clamp-2">{event.title}</div>
+                      <div className="text-[9px] mt-2 opacity-60 flex items-center gap-1">
+                        <Wind className="w-3 h-3" />
+                        {event.location}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -1632,7 +1716,7 @@ const AdminDashboard = ({
                     onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, date: e.target.value } })}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-bold">יום</label>
                     <input 
@@ -1643,11 +1727,34 @@ const AdminDashboard = ({
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold">חודש</label>
+                    <label className="text-sm font-bold">חודש (0-11)</label>
                     <input 
+                      type="number"
+                      min="0"
+                      max="11"
                       className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
-                      value={editingItem.data.month}
-                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, month: e.target.value } })}
+                      value={editingItem.data.monthIndex || 0}
+                      onChange={(e) => {
+                        const idx = parseInt(e.target.value);
+                        const monthsShortHebrew = ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ', 'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'];
+                        setEditingItem({ 
+                          ...editingItem, 
+                          data: { 
+                            ...editingItem.data, 
+                            monthIndex: idx,
+                            month: monthsShortHebrew[idx] || 'ינו'
+                          } 
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold">שנה</label>
+                    <input 
+                      type="number"
+                      className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                      value={editingItem.data.year || 2024}
+                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, year: parseInt(e.target.value) } })}
                     />
                   </div>
                 </div>
@@ -2060,14 +2167,21 @@ export default function App() {
 
   const handleAddEvent = async () => {
     if (!isAdmin) return;
+    const now = new Date();
     const id = `event-${Date.now()}`;
+    const monthsShortHebrew = [
+      'ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ',
+      'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'
+    ];
     const newEvent: Event = {
       id,
       title: "אירוע חדש",
       category: "ג'ודו",
-      date: "תאריך",
-      day: 10,
-      month: "ינו",
+      date: `${now.getDate()} ${monthsShortHebrew[now.getMonth()]}, ${now.getFullYear()}`,
+      day: now.getDate(),
+      month: monthsShortHebrew[now.getMonth()],
+      monthIndex: now.getMonth(),
+      year: now.getFullYear(),
       location: "מיקום",
     };
     try {
