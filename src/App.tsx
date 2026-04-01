@@ -1534,12 +1534,16 @@ const AdminDashboard = ({
   articles,
   onAddEvent,
   onDeleteEvent,
+  onUpdateEvent,
   onAddAthlete,
   onDeleteAthlete,
+  onUpdateAthlete,
   onAddNews,
   onDeleteNews,
+  onUpdateNews,
   onAddArticle,
-  onDeleteArticle
+  onDeleteArticle,
+  onUpdateArticle
 }: { 
   events: Event[], 
   athletes: Athlete[], 
@@ -1547,14 +1551,262 @@ const AdminDashboard = ({
   articles: Article[],
   onAddEvent: () => void,
   onDeleteEvent: (id: string) => void,
+  onUpdateEvent: (event: Event) => void,
   onAddAthlete: () => void,
   onDeleteAthlete: (id: string) => void,
+  onUpdateAthlete: (athlete: Athlete) => void,
   onAddNews: () => void,
   onDeleteNews: (id: string) => void,
+  onUpdateNews: (newsItem: News) => void,
   onAddArticle: () => void,
-  onDeleteArticle: (id: string) => void
+  onDeleteArticle: (id: string) => void,
+  onUpdateArticle: (article: Article) => void
 }) => {
   const [activeTab, setActiveTab] = useState<'events' | 'athletes' | 'news' | 'articles'>('events');
+  const [editingItem, setEditingItem] = useState<{ type: string, data: any } | null>(null);
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+
+    switch (editingItem.type) {
+      case 'event':
+        onUpdateEvent(editingItem.data);
+        break;
+      case 'athlete':
+        onUpdateAthlete(editingItem.data);
+        break;
+      case 'news':
+        onUpdateNews(editingItem.data);
+        break;
+      case 'article':
+        onUpdateArticle(editingItem.data);
+        break;
+    }
+    setEditingItem(null);
+  };
+
+  if (editingItem) {
+    return (
+      <div className="lg:col-span-9 space-y-8">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-surface-container rounded-full transition-colors">
+            <ChevronLeft className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-4xl font-black font-headline">עריכת {editingItem.type === 'event' ? 'אירוע' : editingItem.type === 'athlete' ? 'ספורטאי' : editingItem.type === 'news' ? 'מבזק' : 'כתבה'}</h1>
+        </div>
+
+        <form onSubmit={handleSaveEdit} className="bg-surface-container-low rounded-2xl p-8 border border-white/5 shadow-xl space-y-6">
+          {editingItem.type === 'event' && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">כותרת האירוע</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.title}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">ענף</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.category}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">מיקום</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.location}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, location: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">תאריך (טקסט חופשי)</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.date}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, date: e.target.value } })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold">יום</label>
+                    <input 
+                      type="number"
+                      className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                      value={editingItem.data.day}
+                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, day: parseInt(e.target.value) } })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold">חודש</label>
+                    <input 
+                      className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                      value={editingItem.data.month}
+                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, month: e.target.value } })}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editingItem.data.active}
+                      onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, active: e.target.checked } })}
+                    />
+                    <span className="text-sm font-bold">פעיל כרגע</span>
+                  </label>
+                </div>
+              </div>
+            </>
+          )}
+
+          {editingItem.type === 'athlete' && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">שם הספורטאי</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.name}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, name: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">ענף</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.sport}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, sport: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">קטגוריית משקל/מקצוע</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.category}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">דירוג</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.rank}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, rank: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">מדליות אולימפיות</label>
+                  <input 
+                    type="number"
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.olympicMedals}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, olympicMedals: parseInt(e.target.value) } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">כתובת תמונה</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.heroImage}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, heroImage: e.target.value } })}
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-bold">ביוגרפיה</label>
+                  <textarea 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary h-32"
+                    value={editingItem.data.bio}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, bio: e.target.value } })}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {editingItem.type === 'news' && (
+            <>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">טקסט המבזק</label>
+                  <textarea 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary h-24"
+                    value={editingItem.data.text}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, text: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">קטגוריה</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.category}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {editingItem.type === 'article' && (
+            <>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">כותרת</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.title}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, title: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">קטגוריה</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.category}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, category: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">כתובת תמונה</label>
+                  <input 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary"
+                    value={editingItem.data.image}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, image: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">תקציר</label>
+                  <textarea 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary h-20"
+                    value={editingItem.data.excerpt}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, excerpt: e.target.value } })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold">תוכן</label>
+                  <textarea 
+                    className="w-full bg-surface-container border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary h-48"
+                    value={editingItem.data.content}
+                    onChange={(e) => setEditingItem({ ...editingItem, data: { ...editingItem.data, content: e.target.value } })}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="flex gap-4 pt-4">
+            <button type="submit" className="bg-primary text-background px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform">שמור שינויים</button>
+            <button type="button" onClick={() => setEditingItem(null)} className="bg-surface-container-highest px-8 py-3 rounded-xl font-bold hover:bg-surface-bright transition-colors">ביטול</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="lg:col-span-9 space-y-8">
@@ -1596,9 +1848,14 @@ const AdminDashboard = ({
                       <p className="text-xs text-on-surface-variant">{event.category} | {event.location}</p>
                     </div>
                   </div>
-                  <button onClick={() => onDeleteEvent(event.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
-                    מחק
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingItem({ type: 'event', data: event })} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                      ערוך
+                    </button>
+                    <button onClick={() => onDeleteEvent(event.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
+                      מחק
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1623,9 +1880,14 @@ const AdminDashboard = ({
                       <p className="text-xs text-on-surface-variant">{athlete.sport} | {athlete.category}</p>
                     </div>
                   </div>
-                  <button onClick={() => onDeleteAthlete(athlete.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
-                    מחק
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingItem({ type: 'athlete', data: athlete })} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                      ערוך
+                    </button>
+                    <button onClick={() => onDeleteAthlete(athlete.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
+                      מחק
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1647,9 +1909,14 @@ const AdminDashboard = ({
                     <p className="font-medium">{item.text}</p>
                     <p className="text-xs text-on-surface-variant">{item.timestamp} {item.category && `| ${item.category}`}</p>
                   </div>
-                  <button onClick={() => onDeleteNews(item.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
-                    מחק
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingItem({ type: 'news', data: item })} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                      ערוך
+                    </button>
+                    <button onClick={() => onDeleteNews(item.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
+                      מחק
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1674,9 +1941,14 @@ const AdminDashboard = ({
                       <p className="text-xs text-on-surface-variant">{article.category} | {article.date}</p>
                     </div>
                   </div>
-                  <button onClick={() => onDeleteArticle(article.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
-                    מחק
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingItem({ type: 'article', data: article })} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                      ערוך
+                    </button>
+                    <button onClick={() => onDeleteArticle(article.id)} className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors">
+                      מחק
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1905,6 +2177,42 @@ export default function App() {
     }
   };
 
+  const handleUpdateEvent = async (event: Event) => {
+    if (!isAdmin) return;
+    try {
+      await setDoc(doc(db, 'events', event.id), event);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `events/${event.id}`);
+    }
+  };
+
+  const handleUpdateAthlete = async (athlete: Athlete) => {
+    if (!isAdmin) return;
+    try {
+      await setDoc(doc(db, 'athletes', athlete.id), athlete);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `athletes/${athlete.id}`);
+    }
+  };
+
+  const handleUpdateNews = async (newsItem: News) => {
+    if (!isAdmin) return;
+    try {
+      await setDoc(doc(db, 'news', newsItem.id), newsItem);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `news/${newsItem.id}`);
+    }
+  };
+
+  const handleUpdateArticle = async (article: Article) => {
+    if (!isAdmin) return;
+    try {
+      await setDoc(doc(db, 'articles', article.id), article);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `articles/${article.id}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
       <TopBar onPageChange={handlePageChange} currentPage={currentPage} isAdmin={isAdmin} />
@@ -1944,12 +2252,16 @@ export default function App() {
             articles={articles}
             onAddEvent={handleAddEvent}
             onDeleteEvent={handleDeleteEvent}
+            onUpdateEvent={handleUpdateEvent}
             onAddAthlete={handleAddAthlete}
             onDeleteAthlete={handleDeleteAthlete}
+            onUpdateAthlete={handleUpdateAthlete}
             onAddNews={handleAddNews}
             onDeleteNews={handleDeleteNews}
+            onUpdateNews={handleUpdateNews}
             onAddArticle={handleAddArticle}
             onDeleteArticle={handleDeleteArticle}
+            onUpdateArticle={handleUpdateArticle}
           />
         )}
         {currentPage.startsWith('athlete:') && <AthleteProfilePage athleteId={currentPage.split(':')[1]} onPageChange={handlePageChange} athletes={athletes} />}
