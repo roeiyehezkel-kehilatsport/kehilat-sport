@@ -98,6 +98,34 @@
         "date": { "type": "string", "description": "תאריך פרסום" }
       },
       "required": ["title", "excerpt", "content", "image", "category", "date"]
+    },
+    "Medal": {
+      "title": "מדליה",
+      "description": "תיעוד של מדליה שזכה בה ספורטאי",
+      "type": "object",
+      "properties": {
+        "athleteName": { "type": "string", "description": "שם הספורטאי" },
+        "athleteId": { "type": "string", "description": "מזהה הספורטאי (אופציונלי)" },
+        "sport": { "type": "string", "description": "ענף ספורט" },
+        "competition": { "type": "string", "description": "שם התחרות" },
+        "medalType": { "type": "string", "enum": ["gold", "silver", "bronze"], "description": "סוג המדליה" },
+        "ageCategory": { "type": "string", "description": "קטגוריית גיל (למשל: בוגרים)" },
+        "date": { "type": "string", "description": "תאריך הזכייה" },
+        "year": { "type": "integer", "description": "שנת הזכייה" }
+      },
+      "required": ["athleteName", "sport", "competition", "medalType", "ageCategory", "date", "year"]
+    },
+    "PodcastEpisode": {
+      "title": "פרק פודקאסט",
+      "description": "פרק בפודקאסט הלפיד",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "שם הפרק" },
+        "excerpt": { "type": "string", "description": "תקציר הפרק" },
+        "link": { "type": "string", "description": "קישור להאזנה" },
+        "date": { "type": "string", "description": "תאריך הפרסום" }
+      },
+      "required": ["title", "excerpt", "link", "date"]
     }
   },
   "firestore": {
@@ -116,6 +144,14 @@
     "/articles": {
       "schema": "Article",
       "description": "אוסף כתבות"
+    },
+    "/medals": {
+      "schema": "Medal",
+      "description": "אוסף מדליות"
+    },
+    "/podcasts": {
+      "schema": "PodcastEpisode",
+      "description": "אוסף פרקי פודקאסט"
     }
   }
 }

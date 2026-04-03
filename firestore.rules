@@ -46,12 +46,32 @@ service cloud.firestore {
              data.day is number && data.day >= 1 && data.day <= 31 &&
              data.month is string && data.month.size() > 0 && data.month.size() < 20 &&
              data.location is string && data.location.size() > 0 && data.location.size() < 200 &&
+             (!('ageCategory' in data) || (data.ageCategory is string && data.ageCategory.size() < 100)) &&
              (!('logo' in data) || (data.logo is string && data.logo.size() < 1000)) &&
              (!('heroImage' in data) || (data.heroImage is string && data.heroImage.size() < 1000)) &&
              (!('active' in data) || data.active is bool) &&
              (!('dimmed' in data) || data.dimmed is bool) &&
              (!('athletes' in data) || data.athletes is list) &&
              (!('history' in data) || data.history is list);
+    }
+
+    function isValidMedal(data) {
+      return data.keys().hasAll(['athleteName', 'sport', 'competition', 'medalType', 'ageCategory', 'date', 'year']) &&
+             data.athleteName is string && data.athleteName.size() > 0 && data.athleteName.size() < 200 &&
+             data.sport is string && data.sport.size() > 0 && data.sport.size() < 100 &&
+             data.competition is string && data.competition.size() > 0 && data.competition.size() < 200 &&
+             data.medalType in ['gold', 'silver', 'bronze'] &&
+             data.ageCategory is string && data.ageCategory.size() > 0 && data.ageCategory.size() < 100 &&
+             data.date is string && data.date.size() > 0 && data.date.size() < 100 &&
+             data.year is number && data.year >= 2025;
+    }
+
+    function isValidPodcast(data) {
+      return data.keys().hasAll(['title', 'excerpt', 'link', 'date']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.excerpt is string && data.excerpt.size() > 0 && data.excerpt.size() < 1000 &&
+             data.link is string && data.link.size() > 0 && data.link.size() < 1000 &&
+             data.date is string && data.date.size() > 0 && data.date.size() < 100;
     }
 
     // ===============================================================
@@ -78,6 +98,16 @@ service cloud.firestore {
     match /articles/{articleId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
+    }
+
+    match /medals/{medalId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidMedal(request.resource.data);
+    }
+
+    match /podcasts/{podcastId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidPodcast(request.resource.data);
     }
 
     match /users/{userId} {
